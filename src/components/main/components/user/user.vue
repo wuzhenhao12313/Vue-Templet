@@ -3,6 +3,7 @@
     <Dropdown @on-click="handleClick">
       <Badge :dot="!!messageUnreadCount">
         <Avatar :src="userAvator"/>
+        <span class="userName">{{userName}}</span>
       </Badge>
       <Icon :size="18" type="md-arrow-dropdown"></Icon>
       <DropdownMenu slot="list">
@@ -28,6 +29,10 @@ export default {
     messageUnreadCount: {
       type: Number,
       default: 0
+    },
+    userName: {
+      type: String,
+      default: ''
     }
   },
   methods: {
@@ -36,9 +41,6 @@ export default {
     ]),
     logout () {
       this.handleLogOut().then(() => {
-        this.$router.push({
-          name: 'login'
-        })
       })
     },
     message () {

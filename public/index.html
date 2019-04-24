@@ -4,8 +4,44 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="http://cdn.polelong.com/js/scrollbar/jquery.mCustomScrollbar.min.css">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title></title>
+    <style type="text/css">
+      #my-loading-service {
+        /* height: 100vh; */
+        width: 100vw;
+      }
+
+      #my-loading-service .loadingMask {
+        height: 100vh;
+        width: 100vw;
+        top: 0;
+        z-index: 10000;
+        position: fixed;
+        background-color: rgba(0, 0, 0, 0.65);
+        left: 0;
+      }
+
+      #my-loading-service .loadingMask .loadingSpinner {
+        top: 50%;
+        margin-top: -21px;
+        width: 100%;
+        text-align: center;
+        position: absolute;
+      }
+
+      #my-loading-service .loadingMask .loadingSpinner i {
+        color: #1890ff;
+        font-size: 25px;
+      }
+
+      #my-loading-service .loadingMask .loadingSpinner .loadingText {
+        color: #1890ff;
+        margin: 3px 0;
+        font-size: 14px;
+      }
+    </style>
   </head>
   <body>
     <noscript>

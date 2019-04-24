@@ -15,6 +15,7 @@ import { saveErrorLogger } from '@/api/data'
 import router from '@/router'
 import routers from '@/router/routers'
 import config from '@/config'
+
 const { homeName } = config
 
 const closePage = (state, route) => {
@@ -32,7 +33,8 @@ export default {
     homeRoute: {},
     local: localRead('local'),
     errorList: [],
-    hasReadErrorPage: false
+    hasReadErrorPage: false,
+    pageSize: localStorage.getItem('pole_pageSize') ? localStorage.getItem('pole_pageSize').toInt() : 10
   },
   getters: {
     menuList: (state, getters, rootState) => getMenuByRouter(routers, rootState.user.access),
@@ -85,6 +87,9 @@ export default {
     },
     setHasReadErrorLoggerStatus (state, status = true) {
       state.hasReadErrorPage = status
+    },
+    setPageSize (state, pageSize) {
+      state.pageSize = pageSize
     }
   },
   actions: {

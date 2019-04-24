@@ -1,5 +1,5 @@
 <template>
-  <div ref="dom" class="charts chart-bar"></div>
+  <div ref="dom"></div>
 </template>
 
 <script>
@@ -9,12 +9,13 @@ import { on, off } from '@/libs/tools'
 
 echarts.registerTheme('tdTheme', tdTheme)
 export default {
-  name: 'ChartBar',
+  name: 'ChartLine',
   props: {
-    value: Object,
-    text: String,
-    subtext: String,
-    xAxis: {}
+    value: Array,
+    title: Object,
+    legend: Object,
+    xData: Array,
+    series: Array
   },
   data () {
     return {
@@ -26,62 +27,62 @@ export default {
       this.dom.resize()
     },
     setOption (value) {
-      let xAxisData = Object.keys(value)
-      let seriesData = Object.values(value)
       let option = {
-        title: {
-          text: this.text,
-          subtext: this.subtext,
-          x: 'center'
-        },
+        title: this.title,
         tooltip: {
-          trigger: 'axis',
-          axisPointer: { // 坐标轴指示器，坐标轴触发有效
-            type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+          trigger: 'axis'
+        },
+        legend: this.legend,
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {}
           }
         },
         xAxis: {
           type: 'category',
-          data: xAxisData,
-          ...this.xAxis
+          boundaryGap: false,
+          data: this.xData
         },
         yAxis: {
           type: 'value'
         },
-        series: [{
-          data: seriesData,
-          type: 'bar'
-        }]
+        series: value
       }
       this.dom.setOption(option)
     },
     init () {
-      let xAxisData = Object.keys(this.value)
-      let seriesData = Object.values(this.value)
       let option = {
+        title: this.title,
         tooltip: {
-          trigger: 'axis',
-          axisPointer: { // 坐标轴指示器，坐标轴触发有效
-            type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
-          }
+          trigger: 'axis'
         },
-        title: {
-          text: this.text,
-          subtext: this.subtext,
-          x: 'center'
+        legend: this.legend,
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {}
+          }
         },
         xAxis: {
           type: 'category',
-          data: xAxisData,
-          ...this.xAxis
+          boundaryGap: false,
+          data: this.xData
         },
         yAxis: {
           type: 'value'
         },
-        series: [{
-          data: seriesData,
-          type: 'bar'
-        }]
+        series: this.series
       }
       this.dom = echarts.init(this.$refs.dom, 'tdTheme')
       this.dom.setOption(option)
@@ -97,7 +98,7 @@ export default {
     off(window, 'resize', this.resize)
   },
   watch: {
-    value: {
+    series: {
       handler (newVal, oldVal) {
         if (this.dom) {
           if (newVal) {
@@ -109,7 +110,7 @@ export default {
           this.init()
         }
       },
-      deep: true // 对象内部属性的监听，关键。
+      deep: true
     }
   }
 }

@@ -3,7 +3,7 @@ export default {
    * @description 配置显示在浏览器标签的title
    */
   title: '破浪电子商务应用系统',
-  appCode: 'OA', // 系统编号
+  appCode: 'APP', // 系统编号
   homePage: '/dashboard/workplace', // 首页
   url: {
     cdn: 'http://cdn.polelong.com', // 资源服务器
@@ -11,7 +11,7 @@ export default {
     uploadApi: 'http://fxServer.polelong.com/Uploader', // 上传接口
     localUploadApi: 'http://fxServer.lpole.com/Uploader', // 本地上传接口
     dev: {
-      home: 'http://oa.lpole.com:8081/', // 前端路由
+      home: 'http://oa.lpole.com:8084/', // 前端路由
       service: 'http://fxServer.lpole.com',
       api: 'http://fxServer.lpole.com/api',
       loginApi: 'http://login.lpole.com:8082/#/user/login'

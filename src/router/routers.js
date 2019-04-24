@@ -19,6 +19,38 @@ import parentView from '@/components/parent-view'
 
 export default [
   {
+    path: '/employee',
+    name: '人力资源',
+    code: 'app_employee',
+    meta: {
+      title: '人力资源',
+      icon: 'ios-people'
+    },
+    component: Main,
+    children: [
+      {
+        path: 'employee_home',
+        name: '数据统计',
+        code: 'app_employee_home',
+        meta: {
+          title: '数据统计',
+          icon: 'md-home'
+        },
+        component: () => import('@/view/employee/home.vue')
+      },
+      {
+        path: 'employee_list',
+        name: '员工花名册',
+        code: 'app_employee_list',
+        meta: {
+          title: '员工花名册',
+          icon: 'ios-list'
+        },
+        component: () => import('@/view/employee/list.vue')
+      }
+    ]
+  },
+  {
     path: '/login',
     name: 'login',
     meta: {
@@ -53,6 +85,7 @@ export default [
   {
     path: '',
     name: 'doc',
+    code: 'oa_dashboard',
     meta: {
       title: '文档',
       href: 'https://lison16.github.io/iview-admin-doc/#/',

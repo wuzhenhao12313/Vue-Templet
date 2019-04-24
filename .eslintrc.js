@@ -13,7 +13,13 @@ module.exports = {
       'x-invalid-end-tag': false
     }],
     'no-undef': 'off',
-    'camelcase': 'off'
+    'camelcase': 'off',
+    'no-unused-expressions': 'off',
+    'no-sequences':'off',
+    'no-unused-vars':'off',
+    'vue/valid-template-root':'off',
+    'vue/require-v-for-key':'off',
+    'no-extend-native':'off',
   },
   parserOptions: {
     parser: 'babel-eslint'

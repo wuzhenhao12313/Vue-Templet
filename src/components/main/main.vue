@@ -1,20 +1,24 @@
 <template>
   <Layout style="height: 100%" class="main">
-    <Sider hide-trigger collapsible :width="256" :collapsed-width="64" v-model="collapsed" class="left-sider" :style="{overflow: 'hidden'}">
-      <side-menu accordion ref="sideMenu" :active-name="$route.name" :collapsed="collapsed" @on-select="turnToPage" :menu-list="menuList">
+    <Sider hide-trigger collapsible :width="256" :collapsed-width="64" v-model="collapsed" class="left-sider"
+           :style="{overflow: 'hidden'}">
+      <side-menu accordion ref="sideMenu" :active-name="$route.name" :collapsed="collapsed" @on-select="turnToPage"
+                 :menu-list="menuList">
         <!-- 需要放在菜单上面的内容，如Logo，写在side-menu标签内部，如下 -->
         <div class="logo-con">
-          <img v-show="!collapsed" :src="maxLogo" key="max-logo" />
-          <img v-show="collapsed" :src="minLogo" key="min-logo" />
+          <img v-show="!collapsed" :src="maxLogo" key="max-logo"/>
+          <img v-show="collapsed" :src="minLogo" key="min-logo"/>
         </div>
       </side-menu>
     </Sider>
     <Layout>
       <Header class="header-con">
         <header-bar :collapsed="collapsed" @on-coll-change="handleCollapsedChange">
-          <user :message-unread-count="unreadCount" :user-avator="userAvator"/>
-          <language v-if="$config.useI18n" @on-lang-change="setLocal" style="margin-right: 10px;" :lang="local"/>
-          <error-store v-if="$config.plugin['error-store'] && $config.plugin['error-store'].showInHeader" :has-read="hasReadErrorPage" :count="errorCount"></error-store>
+          <user :message-unread-count="unreadCount" :user-avator="userAvator" :userName="userName"/>
+          <Address></Address>
+          <!--<language v-if="$config.useI18n" @on-lang-change="setLocal" style="margin-right: 10px;" :lang="local"/>-->
+          <error-store v-if="$config.plugin['error-store'] && $config.plugin['error-store'].showInHeader"
+                       :has-read="hasReadErrorPage" :count="errorCount"></error-store>
           <fullscreen v-model="isFullscreen" style="margin-right: 10px;"/>
         </header-bar>
       </Header>
@@ -39,16 +43,18 @@ import SideMenu from './components/side-menu'
 import HeaderBar from './components/header-bar'
 import TagsNav from './components/tags-nav'
 import User from './components/user'
+import Address from './components/address'
 import ABackTop from './components/a-back-top'
 import Fullscreen from './components/fullscreen'
 import Language from './components/language'
 import ErrorStore from './components/error-store'
 import { mapMutations, mapActions, mapGetters } from 'vuex'
-import { getNewTagList, routeEqual } from '@/libs/util'
+import { getNewTagList, routeEqual, matchMenu } from '@/libs/util'
 import routers from '@/router/routers'
-import minLogo from '@/assets/images/logo-min.jpg'
-import maxLogo from '@/assets/images/logo.jpg'
+import minLogo from '@/assets/images/logo-min.png'
+import maxLogo from '@/assets/images/logo.png'
 import './main.less'
+
 export default {
   name: 'Main',
   components: {
@@ -59,7 +65,8 @@ export default {
     Fullscreen,
     ErrorStore,
     User,
-    ABackTop
+    ABackTop,
+    Address
   },
   data () {
     return {
@@ -82,12 +89,16 @@ export default {
     userAvator () {
       return this.$store.state.user.avatorImgPath
     },
+    userName () {
+      return this.$store.state.user.userName
+    },
     cacheList () {
       const list = ['ParentView', ...this.tagNavList.length ? this.tagNavList.filter(item => !(item.meta && item.meta.notCache)).map(item => item.name) : []]
       return list
     },
     menuList () {
-      return this.$store.getters.menuList
+      const list = this.$store.getters.menuList.concat([])
+      return matchMenu(list, this.userMenuList) //
     },
     local () {
       return this.$store.state.app.local
@@ -97,6 +108,9 @@ export default {
     },
     unreadCount () {
       return this.$store.state.user.unreadCount
+    },
+    userMenuList () {
+      return this.$store.state.user.userMenuList
     }
   },
   methods: {
@@ -110,7 +124,9 @@ export default {
     ]),
     ...mapActions([
       'handleLogin',
-      'getUnreadMessageCount'
+      'getUserInfo',
+      'getUnreadMessageCount',
+      'getUserMenuList'
     ]),
     turnToPage (route) {
       let { name, params, query } = {}
@@ -163,8 +179,10 @@ export default {
   },
   mounted () {
     /**
-     * @description 初始化设置面包屑导航和标签导航
-     */
+       * @description 初始化设置面包屑导航和标签导航
+       */
+    this.getUserInfo()
+    this.getUserMenuList()
     this.setTagNavList()
     this.setHomeRoute(routers)
     const { name, params, query, meta } = this.$route
@@ -172,16 +190,14 @@ export default {
       route: { name, params, query, meta }
     })
     this.setBreadCrumb(this.$route)
-    // 设置初始语言
-    this.setLocal(this.$i18n.locale)
     // 如果当前打开页面不在标签栏中，跳到homeName页
     if (!this.tagNavList.find(item => item.name === this.$route.name)) {
       this.$router.push({
         name: this.$config.homeName
       })
     }
-    // 获取未读消息条数
-    this.getUnreadMessageCount()
+    // // 获取未读消息条数
+    // this.getUnreadMessageCount()
   }
 }
 </script>

@@ -6,6 +6,7 @@
 import echarts from 'echarts'
 import tdTheme from './theme.json'
 import { on, off } from '@/libs/tools'
+
 echarts.registerTheme('tdTheme', tdTheme)
 export default {
   name: 'ChartPie',
@@ -22,10 +23,43 @@ export default {
   methods: {
     resize () {
       this.dom.resize()
-    }
-  },
-  mounted () {
-    this.$nextTick(() => {
+    },
+    setOption (value) {
+      let legend = value.map(_ => _.name)
+      let option = {
+        title: {
+          text: this.text,
+          subtext: this.subtext,
+          x: 'center'
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        legend: {
+          orient: 'vertical',
+          left: 'left',
+          data: legend
+        },
+        series: [
+          {
+            type: 'pie',
+            radius: '55%',
+            center: ['50%', '60%'],
+            data: value,
+            itemStyle: {
+              emphasis: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              }
+            }
+          }
+        ]
+      }
+      this.dom.setOption(option)
+    },
+    init () {
       let legend = this.value.map(_ => _.name)
       let option = {
         title: {
@@ -60,11 +94,32 @@ export default {
       }
       this.dom = echarts.init(this.$refs.dom, 'tdTheme')
       this.dom.setOption(option)
+    }
+  },
+  mounted () {
+    this.$nextTick(() => {
+      this.init()
       on(window, 'resize', this.resize)
     })
   },
   beforeDestroy () {
     off(window, 'resize', this.resize)
+  },
+  watch: {
+    value: {
+      handler (newVal, oldVal) {
+        if (this.dom) {
+          if (newVal) {
+            this.setOption(newVal)
+          } else {
+            this.setOption(oldVal)
+          }
+        } else {
+          this.init()
+        }
+      },
+      deep: true // 对象内部属性的监听，关键。
+    }
   }
 }
 </script>

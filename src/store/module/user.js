@@ -1,7 +1,6 @@
 import {
   login,
   logout,
-  getUserInfo,
   getMessage,
   getContentByMsgId,
   hasRead,
@@ -9,13 +8,17 @@ import {
   restoreTrash,
   getUnreadCount
 } from '@/api/user'
-import { setToken, getToken } from '@/libs/util'
+import { getUserMenu, getUserInfo } from '@/api/config'
+import { signOut } from '@/api/login'
+import { setToken, getToken, expandMenu } from '@/libs/util'
+import config from '@/config/'
 
 export default {
   state: {
     userName: '',
     userId: '',
     avatorImgPath: '',
+    userInfo: {},
     token: getToken(),
     access: '',
     hasGetInfo: false,
@@ -23,7 +26,8 @@ export default {
     messageUnreadList: [],
     messageReadedList: [],
     messageTrashList: [],
-    messageContentStore: {}
+    messageContentStore: {},
+    userMenuList: []
   },
   mutations: {
     setAvator (state, avatorPath) {
@@ -34,6 +38,9 @@ export default {
     },
     setUserName (state, name) {
       state.userName = name
+    },
+    setUserInfo (state, userInfo) {
+      state.userInfo = userInfo
     },
     setAccess (state, access) {
       state.access = access
@@ -65,6 +72,9 @@ export default {
       const msgItem = state[from].splice(index, 1)[0]
       msgItem.loading = false
       state[to].unshift(msgItem)
+    },
+    setUserMenuList (state, userMenuList) {
+      state.userMenuList = userMenuList
     }
   },
   getters: {
@@ -92,31 +102,25 @@ export default {
     // 退出登录
     handleLogOut ({ state, commit }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
-          commit('setToken', '')
-          commit('setAccess', [])
+        signOut().then(() => {
           resolve()
         }).catch(err => {
           reject(err)
         })
-        // 如果你的退出登录无需请求接口，则可以直接使用下面三行代码而无需使用logout调用接口
-        // commit('setToken', '')
-        // commit('setAccess', [])
-        // resolve()
       })
     },
     // 获取用户相关信息
     getUserInfo ({ state, commit }) {
       return new Promise((resolve, reject) => {
         try {
-          getUserInfo(state.token).then(res => {
-            const data = res.data
-            commit('setAvator', data.avator)
-            commit('setUserName', data.name)
-            commit('setUserId', data.user_id)
-            commit('setAccess', data.access)
+          getUserInfo().then(res => {
+            const user = res.data.toObject().user
+            commit('setAvator', user.headImage)
+            commit('setUserName', user.userName)
+            commit('setUserId', user.userID)
+            commit('setUserInfo', user)
             commit('setHasGetInfo', true)
-            resolve(data)
+            resolve(user)
           }).catch(err => {
             reject(err)
           })
@@ -211,6 +215,19 @@ export default {
         }).catch(error => {
           reject(error)
         })
+      })
+    },
+    getUserMenuList ({ commit }) {
+      return new Promise((resolve, reject) => {
+        getUserMenu({ appCode: config.appCode })
+          .then(res => {
+            const data = res.data
+            const list = data.toObject().list
+            commit('setUserMenuList', expandMenu(list, 'menuCode'))
+            resolve()
+          }).catch(err => {
+            reject(err)
+          })
       })
     }
   }
